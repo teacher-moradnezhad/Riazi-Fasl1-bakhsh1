@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>گردونه‌ی قهرمان ریاضی — فصل ۱</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1:#1a1440; --bg2:#2a1a5e; --accent:#7c6cff; --accent2:#59c7ff;
+    --gold:#ffd166; --green:#3ee394; --red:#ff4757; --orange:#ff9f43;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{ margin:0; padding:0; width:100%; min-height:100%; font-family:'Vazirmatn',sans-serif;
+    background: var(--bg1); color:#fff; user-select:none; }
+  body{ overflow-y:auto; overflow-x:hidden; }
+  #app{ min-height:100vh; width:100%; position:relative; }
+  .screen{ display:none; flex-direction:column; min-height:100vh; width:100%; padding:0 0 20px 0; }
+  .screen.active{ display:flex; }
+
+  .geo-bg{ position:fixed; inset:0; overflow:hidden; z-index:0; pointer-events:none; }
+  .geo-bg span{ position:absolute; border-radius:30%; opacity:.12; background:linear-gradient(135deg,var(--accent),var(--accent2)); }
+
+  /* ===== Welcome ===== */
+  #welcome{ align-items:center; justify-content:center; text-align:center; padding:24px 16px;
+    background: radial-gradient(ellipse at 30% 15%, rgba(124,108,255,.35), transparent 55%),
+      radial-gradient(ellipse at 80% 85%, rgba(89,199,255,.25), transparent 55%),
+      linear-gradient(160deg, var(--bg1) 0%, var(--bg2) 100%); }
+  .welcome-content{ position:relative; z-index:1; max-width:440px; width:100%; }
+  .astro-icon{ font-size:56px; animation: floaty 3s ease-in-out infinite; }
+  @keyframes floaty{ 0%,100%{transform:translateY(0) rotate(-3deg);} 50%{transform:translateY(-12px) rotate(3deg);} }
+  h1.bismillah{ font-size:22px; font-weight:800; color:var(--gold); margin:8px 0 4px; text-shadow:0 0 12px rgba(255,209,102,.4);}
+  .school-info{ font-size:14px; line-height:1.9; color:#c9c3ff; margin:6px 0 16px;}
+  .school-info b{ color:#fff; }
+  h2.game-title{ font-size:clamp(22px,6vw,30px); font-weight:900; margin:6px 0 10px;
+    background: linear-gradient(90deg,#7c6cff,#59c7ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .game-desc{ font-size:14.5px; color:#d8d4ff; line-height:1.8; margin:0 auto 20px; max-width:400px;}
+  .name-box{ margin-bottom:18px; }
+  .name-box label{ display:block; font-size:13px; color:#c9c3ff; margin-bottom:8px; }
+  .name-box input{ width:100%; max-width:320px; font-family:inherit; font-size:17px; font-weight:700; text-align:center;
+    padding:14px 16px; border-radius:14px; border:2px solid rgba(255,255,255,.2); background:rgba(255,255,255,.08); color:#fff; outline:none; }
+  .name-box input::placeholder{ color:#8a84c0; font-weight:400; }
+  .name-box input:focus{ border-color:var(--accent2); }
+  .btn{ font-family:inherit; border:none; cursor:pointer; font-size:16px; font-weight:800; color:#1a1440;
+    padding:15px 28px; border-radius:16px; transition:transform .15s ease; }
+  .btn:active{ transform:scale(.95); }
+  .btn:disabled{ opacity:.5; cursor:default; }
+  .btn-primary{ background:linear-gradient(135deg,#7c6cff,#59c7ff); color:#fff; box-shadow:0 8px 24px rgba(124,108,255,.4); }
+  .btn-secondary{ background:rgba(255,255,255,.1); color:#fff; border:1.5px solid rgba(255,255,255,.25); }
+
+  /* ===== Game ===== */
+  #game{ background: radial-gradient(ellipse at 50% 0%, var(--bg2), var(--bg1) 70%); position:relative; }
+  .hud{ position:relative; z-index:10; display:flex; align-items:center; justify-content:space-between;
+    padding: calc(10px + env(safe-area-inset-top,0px)) 14px 6px; gap:8px; }
+  .hud-left{ font-size:12px; color:#c9c3ff; font-weight:700; }
+  .hud-left b{ color:#fff; display:block; font-size:14px; }
+  .hud-mid{ text-align:center; }
+  .score-val{ font-size:20px; font-weight:900; color:var(--gold); }
+  .score-label{ font-size:9px; color:#c9c3ff; }
+  .hud-right{ text-align:left; font-size:11px; color:#c9c3ff; font-weight:700; }
+  .hud-buttons{ display:flex; gap:6px; justify-content:center; margin-top:6px; }
+  .hud-btn{ font-family:inherit; font-size:11px; font-weight:800; color:#fff; border:1.5px solid rgba(255,255,255,.25);
+    background:rgba(255,255,255,.1); padding:6px 12px; border-radius:10px; cursor:pointer; }
+  .progress-wrap{ position:relative; z-index:10; margin: 4px 14px 0; height:6px; background:rgba(255,255,255,.1); border-radius:99px; overflow:hidden; }
+  .progress-fill{ height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); width:0%; transition:width .3s ease; }
+
+  .game-body{ position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; padding:14px 16px 20px; gap:14px; }
+
+  .wheel-msg{ font-size:14px; color:var(--gold); font-weight:700; text-align:center; min-height:18px; }
+
+  .wheel-wrap{ display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .wheel-pointer{ font-size:26px; color:#fff; margin-bottom:-14px; z-index:6;
+    filter:drop-shadow(0 3px 5px rgba(0,0,0,.5)); }
+  .wheel{ width:min(60vw,220px); height:min(60vw,220px); --wheel-size:min(60vw,220px); border-radius:50%; position:relative;
+    background: conic-gradient(#59c7ff 0deg 72deg, #3ee394 72deg 144deg, #ffd166 144deg 216deg, #ff9f43 216deg 288deg, #ff4757 288deg 360deg);
+    border:6px solid #fff; box-shadow:0 10px 34px rgba(0,0,0,.4);
+    transition:transform 2.6s cubic-bezier(.15,.67,.15,1);
+  }
+  .wheel-labels{ position:absolute; inset:0; }
+  .wheel-label{ position:absolute; top:50%; left:50%; font-size:11px; font-weight:800; color:#1a1440; white-space:nowrap; }
+  .wheel-center{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:16%; height:16%;
+    background:#fff; border-radius:50%; box-shadow:0 2px 8px rgba(0,0,0,.35); }
+  .spin-btn{ font-family:inherit; font-size:15px; font-weight:900; color:#1a1440; border:none; cursor:pointer;
+    padding:12px 26px; border-radius:14px; background:linear-gradient(135deg,#ffd166,#ff9f43); box-shadow:0 8px 20px rgba(255,159,67,.4); }
+  .spin-btn:disabled{ opacity:.5; cursor:default; }
+
+  /* ===== کارت سؤال ===== */
+  .q-card{ display:none; width:100%; max-width:440px; background:#fff; color:#1a1440;
+    border-radius:22px; padding:18px; box-shadow:0 16px 40px rgba(0,0,0,.4); text-align:center; }
+  .q-card.show{ display:block; animation:qpop .35s ease; }
+  @keyframes qpop{ from{ opacity:0; transform:translateY(14px) scale(.95);} to{ opacity:1; transform:translateY(0) scale(1);} }
+
+  .q-cat-badge{ display:inline-block; font-size:12px; font-weight:800; padding:5px 14px; border-radius:99px; color:#fff; margin-bottom:10px; }
+  .q-text{ font-size:18px; font-weight:800; line-height:1.7; margin-bottom:12px; }
+  .q-text[dir="ltr"]{ direction:ltr; text-align:center; letter-spacing:1px; }
+  .q-input{ width:100%; font-family:inherit; font-size:22px; font-weight:800; text-align:center; padding:13px;
+    border-radius:14px; border:2px solid #d8d4ff; outline:none; margin-bottom:10px; color:#1a1440; }
+  .q-input:focus{ border-color:var(--accent); }
+  .q-check-btn{ width:100%; font-family:inherit; font-size:15px; font-weight:800; color:#fff; border:none; cursor:pointer;
+    padding:13px; border-radius:14px; background:linear-gradient(135deg,#3ee394,#2bb37a); margin-bottom:8px; }
+  .q-check-btn:disabled{ opacity:.5; cursor:default; }
+  .q-next-btn{ width:100%; font-family:inherit; font-size:15px; font-weight:800; color:#fff; border:none; cursor:pointer;
+    padding:13px; border-radius:14px; background:linear-gradient(135deg,#7c6cff,#59c7ff); display:none; margin-bottom:8px; }
+  .q-next-btn.show{ display:block; }
+  .q-feedback{ margin-top:6px; font-size:14px; font-weight:800; min-height:20px; }
+
+  .shake{ animation:shakeit .35s ease; }
+  @keyframes shakeit{ 0%,100%{ transform:translateX(0); } 20%{ transform:translateX(-8px);} 40%{ transform:translateX(8px);} 60%{ transform:translateX(-6px);} 80%{ transform:translateX(6px);} }
+
+  .score-pop{ position:fixed; z-index:30; font-size:22px; font-weight:900; color:var(--gold); pointer-events:none;
+    animation:scorepop 1.1s ease forwards; text-shadow:0 0 8px rgba(255,209,102,.6); }
+  @keyframes scorepop{ 0%{ transform:translate(-50%,-50%) scale(0.6); opacity:0; } 20%{ transform:translate(-50%,-90%) scale(1.15); opacity:1; } 100%{ transform:translate(-50%,-170%) scale(1); opacity:0; } }
+
+  /* ===== Modal درس‌نامه ===== */
+  .modal{ position:fixed; inset:0; background:rgba(10,8,40,.85); backdrop-filter:blur(6px);
+    z-index:100; display:none; align-items:center; justify-content:center; padding:16px; overflow-y:auto; }
+  .modal.show{ display:flex; }
+  .modal-card{ width:100%; max-width:560px; max-height:90vh; overflow-y:auto;
+    background:linear-gradient(160deg,#252060,#1a1440); border-radius:24px; padding:22px;
+    box-shadow:0 25px 70px rgba(0,0,0,.6); border:2px solid rgba(124,108,255,.4); }
+  .modal-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; padding-bottom:12px; border-bottom:1px solid rgba(255,255,255,.15); position:sticky; top:0; background:#252060; z-index:5; }
+  .modal-title{ font-size:20px; font-weight:900; color:var(--gold); }
+  .modal-close{ background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff;
+    width:36px; height:36px; border-radius:50%; cursor:pointer; font-size:16px; font-weight:900; }
+  .lesson-section{ background:rgba(255,255,255,.06); border-radius:16px; padding:14px 16px; margin-bottom:12px;
+    border-right:4px solid var(--accent2); }
+  .lesson-section h3{ margin:0 0 8px; font-size:15px; font-weight:900; color:var(--accent2); }
+  .lesson-section p{ margin:6px 0; font-size:13.5px; line-height:1.9; color:#d8d4ff; }
+  .lesson-section .example{ background:rgba(255,209,102,.1); border-radius:10px; padding:8px 12px; margin-top:8px;
+    font-weight:700; color:var(--gold); direction:ltr; text-align:center; font-size:15px; }
+  .lesson-section .example-label{ font-size:11px; color:#c9c3ff; display:block; margin-bottom:4px; direction:rtl; }
+
+  /* جدول ارزش مکانی — از چپ به راست */
+  .place-table{ width:100%; border-collapse:collapse; margin-top:10px; direction:ltr; font-size:10px; }
+  .place-table th, .place-table td{ border:1px solid rgba(255,255,255,.2); padding:5px 2px; text-align:center; }
+  .place-table th{ background:rgba(89,199,255,.25); color:#fff; font-weight:800; font-size:9px; }
+  .place-table td{ background:rgba(255,255,255,.05); color:#fff; font-weight:800; font-size:13px; }
+  .place-note{ direction:rtl; text-align:right; font-size:12px; color:#c9c3ff; margin-top:8px; line-height:1.8; }
+
+  /* ===== Finish ===== */
+  #finish{ align-items:center; justify-content:center; text-align:center; padding:28px 16px;
+    background:radial-gradient(ellipse at 50% 15%, var(--bg2), var(--bg1) 65%); }
+  .finish-title{ font-size:clamp(24px,6vw,32px); font-weight:900; margin-bottom:6px;}
+  .finish-school{ font-size:12.5px; color:#c9c3ff; line-height:1.8; margin-bottom:14px; }
+  .finish-name{ font-size:16px; font-weight:800; color:var(--gold); margin-bottom:14px; }
+  .finish-msg{ font-size:15px; color:var(--gold); font-weight:700; margin-bottom:18px; max-width:400px;}
+  .result-table{ width:100%; max-width:380px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.15);
+    border-radius:16px; padding:6px 18px; margin-bottom:16px; }
+  .result-row{ display:flex; justify-content:space-between; padding:10px 0; font-size:14px; border-bottom:1px solid rgba(255,255,255,.08);}
+  .result-row:last-child{ border-bottom:none; }
+  .result-row b{ color:#fff; font-size:16px; }
+
+  .review-section{ width:100%; max-width:420px; background:rgba(255,71,87,.1); border:1.5px solid rgba(255,71,87,.35);
+    border-radius:16px; padding:14px 16px; margin-bottom:16px; text-align:right; }
+  .review-title{ font-size:14px; font-weight:900; color:#ff8a95; margin-bottom:10px; }
+  .review-list{ display:flex; flex-direction:column; gap:8px; max-height:200px; overflow-y:auto; }
+  .review-item{ background:rgba(255,255,255,.06); border-radius:10px; padding:10px 12px; font-size:13px; line-height:1.8; }
+  .review-item .q{ color:#fff; font-weight:700; text-align:center; }
+  .review-item .a{ color:var(--green); font-size:12px; margin-top:4px; display:block; text-align:center; }
+  .review-empty{ color:var(--green); font-weight:800; text-align:center; padding:10px; font-size:14px; }
+
+  .best-score{ font-size:13px; color:var(--gold); margin-bottom:16px; font-weight:700; }
+  .btn-row{ display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
+
+  @media (min-width:700px){ .btn{ font-size:17px; padding:16px 30px; } }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ===================== WELCOME ===================== -->
+  <div class="screen active" id="welcome">
+    <div class="geo-bg" id="geoBg"></div>
+    <div class="welcome-content">
+      <div class="astro-icon">🎡🧮</div>
+      <h1 class="bismillah">به نام خدا</h1>
+      <div class="school-info">
+        <div><b>آموزگار:</b> خانم مرادنژاد</div>
+        <div><b>مدرسه:</b> دبستان پسرانه امام رضا (ع)</div>
+        <div><b>کلاس:</b> ۵/۳</div>
+      </div>
+      <h2 class="game-title">گردونه‌ی قهرمان ریاضی<br>فصل ۱</h2>
+      <p class="game-desc">تو یک قهرمان ریاضی هستی! گردونه را بچرخان، سؤال بیاید و جواب بده.</p>
+      <div class="name-box">
+        <label>اسمت را بنویس:</label>
+        <input type="text" id="studentName" placeholder="مثلاً: علی محمدی" maxlength="30">
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="startGame()">🚀 شروع بازی</button>
+        <button class="btn btn-secondary" onclick="openLesson()">📚 درس‌نامه</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== GAME ===================== -->
+  <div class="screen" id="game">
+    <div class="hud">
+      <div class="hud-left"><span>دانش‌آموز</span><b id="hudName">—</b></div>
+      <div class="hud-mid">
+        <div class="score-val" id="scoreDisplay">۰</div>
+        <div class="score-label">امتیاز</div>
+      </div>
+      <div class="hud-right"><span id="qCountDisplay">سؤال ۰ از ۱۰</span><br><span id="catDisplay">—</span></div>
+    </div>
+    <div class="hud-buttons">
+      <button class="hud-btn" onclick="openLesson()">📚 درس‌نامه</button>
+    </div>
+    <div class="progress-wrap"><div class="progress-fill" id="progressFill"></div></div>
+
+    <div class="game-body">
+      <div class="wheel-msg" id="wheelMsg">🎡 گردونه را بچرخان!</div>
+      <div class="wheel-wrap">
+        <div class="wheel-pointer">▼</div>
+        <div class="wheel" id="wheel">
+          <div class="wheel-labels" id="wheelLabels"></div>
+          <div class="wheel-center"></div>
+        </div>
+        <button class="spin-btn" id="spinBtn" onclick="spinWheel()">🎯 بچرخان!</button>
+      </div>
+
+      <div class="q-card" id="qCard">
+        <div class="q-cat-badge" id="qCatBadge">جمع</div>
+        <div class="q-text" id="qText" dir="rtl">۳ + ۴ = ؟</div>
+        <input class="q-input" id="qInput" placeholder="جواب را بنویس" autocomplete="off">
+        <button class="q-check-btn" id="qCheckBtn" onclick="checkAnswer()">✅ بررسی جواب</button>
+        <button class="q-next-btn" id="qNextBtn" onclick="nextQuestion()">سؤال بعدی ←</button>
+        <div class="q-feedback" id="qFeedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== FINISH ===================== -->
+  <div class="screen" id="finish">
+    <div>
+      <div style="font-size:52px;">🏆</div>
+      <div class="finish-title">پایان بازی</div>
+      <div class="finish-school">
+        آموزگار: خانم مرادنژاد &nbsp;|&nbsp; دبستان پسرانه امام رضا (ع) &nbsp;|&nbsp; کلاس ۵/۳
+      </div>
+      <div class="finish-name" id="finishName"></div>
+      <div class="finish-msg" id="finishMsg"></div>
+      <div class="result-table" id="resultTable"></div>
+
+      <div class="review-section">
+        <div class="review-title">📝 برای مرور — سؤالاتی که اشتباه زدی</div>
+        <div class="review-list" id="reviewList"></div>
+      </div>
+
+      <div class="best-score" id="bestScore"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="restartGame()">🔄 شروع مجدد</button>
+        <button class="btn btn-secondary" onclick="goHome()">🏠 بازگشت به خانه</button>
+        <button class="btn btn-secondary" onclick="openLesson()">📚 درس‌نامه</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL درس‌نامه ===================== -->
+  <div class="modal" id="lessonModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">📚 درس‌نامه — فصل ۱</div>
+        <button class="modal-close" onclick="closeLesson()">✕</button>
+      </div>
+
+      <!-- بخش ۱: فرق رقم و عدد -->
+      <div class="lesson-section">
+        <h3>🔢 فرق «رقم» و «عدد»</h3>
+        <p><b>رقم:</b> یه نماد تنهاست که برای نوشتن اعداد استفاده می‌شه. رقم‌ها فقط ۱۰ تا هستن: ۰، ۱، ۲، ۳، ۴، ۵، ۶، ۷، ۸، ۹</p>
+        <p><b>عدد:</b> از کنار هم قرار گرفتن چند رقم ساخته می‌شه و یه مقدار داره.</p>
+        <div class="example" style="direction:rtl;text-align:right;">
+          <span class="example-label">مثال‌های واقعی</span>
+          🚗 پلاک ماشین: «۱۲ ب ۳۴۵» → رقم‌ها: ۱، ۲، ۳، ۴، ۵<br>
+          🏠 پلاک خانه: «۱۲۳» → سه رقم داره، عددش ۱۲۳ هست<br>
+          📞 شماره تلفن: «۰۹۱۲۳۴۵۶۷۸» → ۱۱ رقم داره<br>
+          🎫 شماره دانش‌آموزی: یه عدده، نه یه رقم
+        </div>
+      </div>
+
+      <!-- بخش ۲: ارزش مکانی + جدول -->
+      <div class="lesson-section">
+        <h3>🎯 ارزش مکانی</h3>
+        <p>هر رقم تو یه عدد، بر اساس جایگاهش یه ارزش داره. جدول زیر جایگاه‌ها رو نشون می‌ده (از <b>چپ</b> به <b>راست</b>: بزرگ به کوچک):</p>
+        
+        <table class="place-table">
+          <thead>
+            <tr>
+              <th>صدگان میلیارد</th>
+              <th>دهگان میلیارد</th>
+              <th>یکان میلیارد</th>
+              <th>صدگان میلیون</th>
+              <th>دهگان میلیون</th>
+              <th>یکان میلیون</th>
+              <th>صدگان هزار</th>
+              <th>دهگان هزار</th>
+              <th>یکان هزار</th>
+              <th>صدگان</th>
+              <th>دهگان</th>
+              <th>یکان</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>—</td>
+              <td>—</td>
+              <td>—</td>
+              <td>—</td>
+              <td>—</td>
+              <td>—</td>
+              <td>—</td>
+              <td>۳</td>
+              <td>۶</td>
+              <td>۰</td>
+              <td>۷</td>
+              <td>۲</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p class="place-note">📌 عدد ۳۶۰۷۲: از راست به چپ — یکان: ۲، دهگان: ۷، صدگان: ۰، یکان هزار: ۶، دهگان هزار: ۳</p>
+        <p class="place-note">📌 عدد ۹۱۵۸۴۰: از راست به چپ — یکان: ۰، دهگان: ۴، صدگان: ۸، یکان هزار: ۵، دهگان هزار: ۱، صدگان هزار: ۹</p>
+      </div>
+
+      <!-- بخش ۳: جمع و تفریق -->
+      <div class="lesson-section">
+        <h3>➕ جمع و تفریق</h3>
+        <p>برای جمع و تفریق اعداد بزرگ، از راست به چپ عمل کن. یکان‌ها رو زیر هم بنویس.</p>
+        <div class="example">
+          <span class="example-label">جمع</span>
+          ۳۰۲۰۴ + ۷۰۹۰۳ = ۱۰۱۱۰۷
+        </div>
+        <div class="example">
+          <span class="example-label">تفریق</span>
+          ۸۰۴۰۰۰ − ۷۳۰۰۰۰ = ۷۴۰۰۰
+        </div>
+      </div>
+
+      <!-- بخش ۴: ضرب -->
+      <div class="lesson-section">
+        <h3>✖️ ضرب</h3>
+        <p>ضرب در ۱۰: یه صفر به عدد اضافه کن.</p>
+        <p>ضرب در ۱۰۰: دو صفر اضافه کن.</p>
+        <p>ضرب در ۱۰۰۰: سه صفر اضافه کن.</p>
+        <div class="example">
+          <span class="example-label">مثال</span>
+          ۲۵۰ × ۱۰ = ۲۵۰۰<br>
+          ۸۰۰۰ × ۲۰۰۰ = ۱۶۰۰۰۰۰۰
+        </div>
+      </div>
+
+      <!-- بخش ۵: تقسیم -->
+      <div class="lesson-section">
+        <h3>➗ تقسیم</h3>
+        <p>تقسیم، عمل برعکس ضربه. برای تقسیم اعداد بزرگ، هر دو عدد رو بر یه عدد مشترک تقسیم کن.</p>
+        <div class="example">
+          <span class="example-label">مثال</span>
+          ۸۰۰۰۰ ÷ ۴۰۰۰ = ۲۰<br>
+          ۴۷۵ ÷ ۹ = ۵۲ (باقی‌مانده ۷)
+        </div>
+      </div>
+
+      <!-- بخش ۶: نکته طلایی -->
+      <div class="lesson-section">
+        <h3>🌟 نکته‌ی طلایی</h3>
+        <p>قبل از جواب دادن، سؤال رو با دقت بخون و از خودت بپرس: «چه چیزی از من خواسته شده؟»</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script>
+/* ======================================================
+   گردونه‌ی قهرمان ریاضی — فصل ۱
+   نسخه‌ی نهایی با سؤالات دقیق
+====================================================== */
+
+/* ---------- صداها ---------- */
+let audioCtx=null;
+function ac(){ if(!audioCtx){ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); } return audioCtx; }
+function tone(freq,dur,type='sine',vol=0.06,delay=0){
+  try{
+    const ctx=ac(); const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type=type; o.frequency.value=freq; o.connect(g); g.connect(ctx.destination);
+    const t0=ctx.currentTime+delay;
+    g.gain.setValueAtTime(0.0001,t0);
+    g.gain.exponentialRampToValueAtTime(vol,t0+0.05);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+    o.start(t0); o.stop(t0+dur+0.05);
+  }catch(e){}
+}
+function soundSpin(){ [523,659,784,1046].forEach((f,i)=>tone(f,0.4,'sine',0.04,i*0.15)); }
+function soundStop(){ tone(660,0.2,'sine',0.06); tone(880,0.25,'sine',0.05,0.1); }
+function soundCorrect(){ [660,880,1100].forEach((f,i)=>tone(f,0.2,'sine',0.07,i*0.08)); }
+function soundWrong(){ tone(330,0.25,'sine',0.06); tone(260,0.3,'sine',0.05,0.12); }
+function soundWin(){ [523,659,784,1046,1318].forEach((f,i)=>tone(f,0.25,'sine',0.07,i*0.15)); }
+
+/* ---------- پس‌زمینه‌ی هندسی ---------- */
+(function buildGeoBg(){
+  const wrap=document.getElementById('geoBg');
+  if(!wrap) return;
+  for(let i=0;i<10;i++){
+    const s=document.createElement('span');
+    const size=40+Math.random()*90;
+    s.style.width=size+'px'; s.style.height=size+'px';
+    s.style.left=Math.random()*100+'%'; s.style.top=Math.random()*100+'%';
+    s.style.transform=`rotate(${Math.random()*60}deg)`;
+    wrap.appendChild(s);
+  }
+})();
+
+/* ---------- توابع صفحه ---------- */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function goHome(){ showScreen('welcome'); }
+
+/* ---------- درس‌نامه Modal ---------- */
+function openLesson(){ document.getElementById('lessonModal').classList.add('show'); }
+function closeLesson(){ document.getElementById('lessonModal').classList.remove('show'); }
+
+/* ---------- اعداد فارسی ---------- */
+const fa = n => String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+const faToEnDigits = s => String(s).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+
+/* ======================================================
+   ⚠️ سؤالات ارزش مکانی با جواب دقیق
+   ⚠️ محاسبه: از راست به چپ
+   ⚠️ یکان ← دهگان ← صدگان ← یکان هزار ← دهگان هزار ← صدگان هزار ← یکان میلیون ← دهگان میلیون ← صدگان میلیون ← یکان میلیارد ← دهگان میلیارد ← صدگان میلیارد
+====================================================== */
+const categories = [
+  { key:'place', name:'ارزش مکانی', color:'#59c7ff', numeric:false, questions:[
+      /* ===== سؤال ۱: عدد ۲۷۳، رقم ۷ ===== 
+         ۲ ۷ ۳
+         یکان: ۳، دهگان: ۷، صدگان: ۲
+         جواب: دهگان ✅ */
+      { q:'در عدد ۲۷۳، رقم ۷ در چه مرتبه‌ای است؟', a:'دهگان' },
+      
+      /* ===== سؤال ۲: عدد ۴۵۸۹، رقم ۵ ===== 
+         ۴ ۵ ۸ ۹
+         یکان: ۹، دهگان: ۸، صدگان: ۵، یکان هزار: ۴
+         جواب: صدگان ✅ */
+      { q:'در عدد ۴۵۸۹، رقم ۵ در چه مرتبه‌ای است؟', a:'صدگان' },
+      
+      /* ===== سؤال ۳: عدد ۳۶۰۷۲، رقم ۶ ===== 
+         ۳ ۶ ۰ ۷ ۲
+         یکان: ۲، دهگان: ۷، صدگان: ۰، یکان هزار: ۶، دهگان هزار: ۳
+         جواب: یکان هزار ✅ */
+      { q:'در عدد ۳۶۰۷۲، رقم ۶ در چه مرتبه‌ای است؟', a:'یکان هزار' },
+      
+      /* ===== سؤال ۴: عدد ۳۶۰۷۲، رقم ۳ ===== 
+         ۳ ۶ ۰ ۷ ۲
+         یکان: ۲، دهگان: ۷، صدگان: ۰، یکان هزار: ۶، دهگان هزار: ۳
+         جواب: دهگان هزار ✅ */
+      { q:'در عدد ۳۶۰۷۲، رقم ۳ در چه مرتبه‌ای است؟', a:'دهگان هزار' },
+      
+      /* ===== سؤال ۵: عدد ۹۱۵۸۴۰، رقم ۱ ===== 
+         ۹ ۱ ۵ ۸ ۴ ۰
+         یکان: ۰، دهگان: ۴، صدگان: ۸، یکان هزار: ۵، دهگان هزار: ۱، صدگان هزار: ۹
+         جواب: دهگان هزار ✅ */
+      { q:'در عدد ۹۱۵۸۴۰، رقم ۱ در چه مرتبه‌ای است؟', a:'دهگان هزار' },
+      
+      /* ===== سؤال ۶: عدد ۹۱۵۸۴۰، رقم ۹ ===== 
+         ۹ ۱ ۵ ۸ ۴ ۰
+         یکان: ۰، دهگان: ۴، صدگان: ۸، یکان هزار: ۵، دهگان هزار: ۱، صدگان هزار: ۹
+         جواب: صدگان هزار ✅ */
+      { q:'در عدد ۹۱۵۸۴۰، رقم ۹ در چه مرتبه‌ای است؟', a:'صدگان هزار' },
+      
+      /* ===== سؤال ۷: عدد ۷۲۴۵۶۸۳، رقم ۲ ===== 
+         ۷ ۲ ۴ ۵ ۶ ۸ ۳
+         یکان: ۳، دهگان: ۸، صدگان: ۶، یکان هزار: ۵، دهگان هزار: ۴، صدگان هزار: ۲، یکان میلیون: ۷
+         جواب: صدگان هزار ✅ */
+      { q:'در عدد ۷۲۴۵۶۸۳، رقم ۲ در چه مرتبه‌ای است؟', a:'صدگان هزار' },
+      
+      /* ===== سؤال ۸: عدد ۸۵۰۰۰۰۰، رقم ۵ ===== 
+         ۸ ۵ ۰ ۰ ۰ ۰ ۰
+         یکان: ۰، دهگان: ۰، صدگان: ۰، یکان هزار: ۰، دهگان هزار: ۰، صدگان هزار: ۵، یکان میلیون: ۸
+         جواب: صدگان هزار ✅ (اصلاح شد) */
+      { q:'در عدد ۸۵۰۰۰۰۰، رقم ۵ در چه مرتبه‌ای است؟', a:'صدگان هزار' },
+      
+      /* ===== سؤال ۹: عدد ۴۷۲۹۱۵۳۸، رقم ۷ ===== 
+         ۴ ۷ ۲ ۹ ۱ ۵ ۳ ۸
+         یکان: ۸، دهگان: ۳، صدگان: ۵، یکان هزار: ۱، دهگان هزار: ۹، صدگان هزار: ۲، یکان میلیون: ۷، دهگان میلیون: ۴
+         جواب: یکان میلیون ✅ (اصلاح شد) */
+      { q:'در عدد ۴۷۲۹۱۵۳۸، رقم ۷ در چه مرتبه‌ای است؟', a:'یکان میلیون' },
+      
+      /* ===== سؤال ۱۰: عدد ۹۲۸۴۶۱۷۳۵، رقم ۲ ===== 
+         ۹ ۲ ۸ ۴ ۶ ۱ ۷ ۳ ۵
+         یکان: ۵، دهگان: ۳، صدگان: ۷، یکان هزار: ۱، دهگان هزار: ۶، صدگان هزار: ۴، یکان میلیون: ۸، دهگان میلیون: ۲، صدگان میلیون: ۹
+         جواب: دهگان میلیون ✅ (اصلاح شد) */
+      { q:'در عدد ۹۲۸۴۶۱۷۳۵، رقم ۲ در چه مرتبه‌ای است؟', a:'دهگان میلیون' },
+      
+      /* ===== سؤال ۱۱: عدد ۳۱۴۵۹۲۶۸۷۰، رقم ۴ ===== 
+         ۳ ۱ ۴ ۵ ۹ ۲ ۶ ۸ ۷ ۰
+         یکان: ۰، دهگان: ۷، صدگان: ۸، یکان هزار: ۶، دهگان هزار: ۲، صدگان هزار: ۹، یکان میلیون: ۵، دهگان میلیون: ۴، صدگان میلیون: ۱، یکان میلیارد: ۳
+         جواب: دهگان میلیون ✅ (اصلاح شد) */
+      { q:'در عدد ۳۱۴۵۹۲۶۸۷۰، رقم ۴ در چه مرتبه‌ای است؟', a:'دهگان میلیون' },
+      
+      /* ===== سؤال ۱۲: عدد ۵۷۸۲۳۴۱۶۹۰، رقم ۸ ===== 
+         ۵ ۷ ۸ ۲ ۳ ۴ ۱ ۶ ۹ ۰
+         یکان: ۰، دهگان: ۹، صدگان: ۶، یکان هزار: ۱، دهگان هزار: ۴، صدگان هزار: ۳، یکان میلیون: ۲، دهگان میلیون: ۸، صدگان میلیون: ۷، یکان میلیارد: ۵
+         جواب: دهگان میلیون ✅ (اصلاح شد) */
+      { q:'در عدد ۵۷۸۲۳۴۱۶۹۰، رقم ۸ در چه مرتبه‌ای است؟', a:'دهگان میلیون' },
+  ]},
+  { key:'add', name:'جمع', color:'#3ee394', numeric:true, questions:[
+      { q:'۳۰۲۰۴ + ۷۰۹۰۳ = ؟', a:'101107' },
+      { q:'۴۵۰۰۰ + ۳۲۰۰۰ = ؟', a:'77000' },
+      { q:'۲۳۵۰۰۰ + ۱۲۴۰۰۰ = ؟', a:'359000' },
+      { q:'۸۰۰۰۰۰ + ۱۵۰۰۰۰ = ؟', a:'950000' },
+      { q:'۱۲۵۰۰۰۰ + ۳۷۵۰۰۰ = ؟', a:'1625000' },
+      { q:'۲۳۴۵۶ + ۱۲۳۴۵ = ؟', a:'35801' },
+      { q:'۴۵۶۷۸ + ۵۴۳۲۲ = ؟', a:'100000' },
+      { q:'۱۲۳۴۵۶ + ۲۳۴۵۶۷ = ؟', a:'358023' },
+      { q:'۸۷۶۵۴ + ۲۳۴۵۶ = ؟', a:'111110' },
+      { q:'۵۰۰۰۰۰ + ۵۰۰۰۰۰ = ؟', a:'1000000' },
+  ]},
+  { key:'sub', name:'تفریق', color:'#ffd166', numeric:true, questions:[
+      { q:'۸۰۴۰۰۰ - ۷۳۰۰۰۰ = ؟', a:'74000' },
+      { q:'۹۰۰۰۰ - ۲۵۰۰۰ = ؟', a:'65000' },
+      { q:'۵۰۰۰۰۰ - ۱۲۵۰۰۰ = ؟', a:'375000' },
+      { q:'۷۵۰۰۰۰ - ۳۸۵۰۰۰ = ؟', a:'365000' },
+      { q:'۱۰۰۰۰۰۰ - ۴۵۰۰۰۰ = ؟', a:'550000' },
+      { q:'۴۵۶۷۸ - ۲۳۴۵۶ = ؟', a:'22222' },
+      { q:'۸۷۶۵۴ - ۱۲۳۴۵ = ؟', a:'75309' },
+      { q:'۹۹۹۹۹۹ - ۸۸۸۸۸۸ = ؟', a:'111111' },
+      { q:'۱۰۰۰۰۰ - ۴۵۶۷۸ = ؟', a:'54322' },
+      { q:'۵۰۰۰۰۰ - ۲۳۴۵۶۷ = ؟', a:'265433' },
+  ]},
+  { key:'mul', name:'ضرب', color:'#ff9f43', numeric:true, questions:[
+      { q:'۲۵۰ × ۱۰ = ؟', a:'2500' },
+      { q:'۸۰۰۲۰ × ۵۰ = ؟', a:'4001000' },
+      { q:'۴۳۰۰۰ × ۲۰۰ = ؟', a:'8600000' },
+      { q:'۸۰۰۰ × ۲۰۰۰ = ؟', a:'16000000' },
+      { q:'۲۳ × ۳۷۱ = ؟', a:'8533' },
+      { q:'۵۰۰ × ۱۰۰ = ؟', a:'50000' },
+      { q:'۲۰۰۰ × ۳۰۰۰ = ؟', a:'6000000' },
+      { q:'۱۵۰ × ۲۰ = ؟', a:'3000' },
+      { q:'۲۵ × ۴۰ = ؟', a:'1000' },
+      { q:'۱۲۳ × ۱۰۰ = ؟', a:'12300' },
+  ]},
+  { key:'div', name:'تقسیم', color:'#ff4757', numeric:true, questions:[
+      { q:'۴۷۵ ÷ ۹ = ؟ (فقط خارج‌قسمت)', a:'52' },
+      { q:'۸۰۰۰۰ ÷ ۴۰۰۰ = ؟', a:'20' },
+      { q:'۹۰۰۰ ÷ ۳۰۰ = ؟', a:'30' },
+      { q:'۸۰۰۰ ÷ ۲۰۰۰ = ؟', a:'4' },
+      { q:'۴۳۲۸ ÷ ۱۱ = ؟ (فقط خارج‌قسمت)', a:'393' },
+      { q:'۱۰۰۰۰ ÷ ۱۰۰ = ؟', a:'100' },
+      { q:'۶۰۰۰ ÷ ۲۰۰ = ؟', a:'30' },
+      { q:'۹۰۰ ÷ ۳۰ = ؟', a:'30' },
+      { q:'۷۲۰ ÷ ۸ = ؟', a:'90' },
+      { q:'۵۰۰۰ ÷ ۵۰۰ = ؟', a:'10' },
+  ]},
+];
+
+/* ---------- ساخت برچسب‌های گردونه ---------- */
+(function buildWheelLabels(){
+  const wrap = document.getElementById('wheelLabels');
+  if(!wrap) return;
+  wrap.innerHTML = categories.map((c,i)=>{
+    const angle = i*72+36;
+    return `<div class="wheel-label" style="transform:translate(-50%,-50%) rotate(${angle}deg) translateY(calc(var(--wheel-size) * -0.32)) rotate(${-angle}deg);">${c.name}</div>`;
+  }).join('');
+})();
+
+/* ---------- وضعیت بازی ---------- */
+let studentName='';
+let score=0, askedCount=0, correctCount=0, wrongCount=0;
+let categoryUsed = {};
+let categoryQuestionPool = {};
+let currentCategory=null, currentQuestion=null;
+let wheelRotation=0;
+let gameState='idle';
+let wrongAnswers = [];
+
+const TOTAL_QUESTIONS=10, MAX_PER_CATEGORY=2;
+
+function shuffleArr(arr){ return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(v=>v[1]); }
+
+function resetGameState(){
+  score=0; askedCount=0; correctCount=0; wrongCount=0;
+  wrongAnswers = [];
+  categoryUsed={}; categoryQuestionPool={};
+  categories.forEach(c=>{
+    categoryUsed[c.key]=0;
+    categoryQuestionPool[c.key]=shuffleArr(c.questions.map((_,i)=>i));
+  });
+  wheelRotation=0;
+  document.getElementById('wheel').style.transform='rotate(0deg)';
+  gameState='idle';
+  updateHUD();
+}
+
+function startGame(){
+  const input = document.getElementById('studentName');
+  const name = input.value.trim();
+  if(!name){ input.focus(); input.style.borderColor='var(--red)'; return; }
+  studentName = name;
+  document.getElementById('hudName').textContent = studentName;
+  resetGameState();
+  showScreen('game');
+  document.getElementById('qCard').classList.remove('show');
+  document.getElementById('qNextBtn').classList.remove('show');
+  document.getElementById('wheelMsg').textContent = '🎡 گردونه را بچرخان!';
+}
+function restartGame(){ showScreen('welcome'); }
+
+/* ---------- HUD ---------- */
+function updateHUD(){
+  document.getElementById('scoreDisplay').textContent = fa(score);
+  document.getElementById('qCountDisplay').textContent = `سؤال ${fa(Math.min(askedCount,10))} از ۱۰`;
+  document.getElementById('progressFill').style.width = (Math.min(askedCount,10)/10*100)+'%';
+}
+
+/* ---------- انتخاب دسته ---------- */
+function pickCategoryIndex(){
+  const candidates = categories.map((c,i)=>i).filter(i=>categoryUsed[categories[i].key] < MAX_PER_CATEGORY);
+  if(candidates.length===0) return Math.floor(Math.random()*categories.length);
+  return candidates[Math.floor(Math.random()*candidates.length)];
+}
+
+/* ---------- چرخاندن گردونه ---------- */
+function spinWheel(){
+  if(gameState!=='idle') return;
+  if(askedCount>=TOTAL_QUESTIONS) return;
+  gameState='spinning';
+  document.getElementById('spinBtn').disabled=true;
+  document.getElementById('qCard').classList.remove('show');
+  document.getElementById('qNextBtn').classList.remove('show');
+  document.getElementById('wheelMsg').textContent='🎡 در حال چرخش...';
+  soundSpin();
+
+  const catIndex = pickCategoryIndex();
+  const targetOffset = (360 - ((catIndex*72+36) % 360)) % 360;
+  const currentMod = ((wheelRotation % 360) + 360) % 360;
+  let delta = targetOffset - currentMod;
+  if(delta <= 0) delta += 360;
+  wheelRotation += 5*360 + delta;
+  document.getElementById('wheel').style.transform = `rotate(${wheelRotation}deg)`;
+
+  setTimeout(()=>{
+    soundStop();
+    landOnCategory(catIndex);
+  }, 2650);
+}
+
+function landOnCategory(catIndex){
+  currentCategory = categories[catIndex];
+  document.getElementById('wheelMsg').textContent = `دسته‌ی انتخاب‌شده: ${currentCategory.name}`;
+  loadQuestion();
+  gameState='question';
+}
+
+/* ---------- بارگذاری سؤال ---------- */
+function loadQuestion(){
+  const key = currentCategory.key;
+  let pool = categoryQuestionPool[key];
+  if(pool.length===0) pool = categoryQuestionPool[key] = shuffleArr(currentCategory.questions.map((_,i)=>i));
+  const qIdx = pool.pop();
+  currentQuestion = currentCategory.questions[qIdx];
+  categoryUsed[key]++;
+  askedCount++;
+  updateHUD();
+  document.getElementById('catDisplay').textContent = currentCategory.name;
+
+  const badge = document.getElementById('qCatBadge');
+  badge.textContent = currentCategory.name;
+  badge.style.background = currentCategory.color;
+  badge.style.color = (currentCategory.key==='place'||currentCategory.key==='sub') ? '#1a1440' : '#fff';
+
+  const qTextEl = document.getElementById('qText');
+  qTextEl.textContent = currentQuestion.q;
+  qTextEl.setAttribute('dir', currentCategory.numeric ? 'ltr' : 'rtl');
+
+  const inputEl = document.getElementById('qInput');
+  inputEl.value='';
+  inputEl.disabled=false;
+  inputEl.setAttribute('inputmode', currentCategory.numeric ? 'numeric' : 'text');
+  document.getElementById('qFeedback').textContent='';
+  document.getElementById('qCheckBtn').disabled=false;
+  document.getElementById('qNextBtn').classList.remove('show');
+  document.getElementById('qCard').classList.add('show');
+  document.getElementById('spinBtn').disabled=true;
+}
+
+/* ---------- نرمال‌سازی قوی ---------- */
+function normalizePlaceWord(s){
+  if(!s) return '';
+  return faToEnDigits(s)
+    /* حذف فاصله، نیم‌فاصله، خط تیره */
+    .replace(/[\s\u200c\u200f\u200e\u0640\u200b\u00a0]+/g,'')
+    /* ی عربی و الف مقصوره → ی */
+    .replace(/[يىئ]/g,'ی')
+    /* ک عربی → ک */
+    .replace(/ك/g,'ک')
+    /* انواع الف → ا */
+    .replace(/[أإآٱا]/g,'ا')
+    /* همزه */
+    .replace(/[ؤئ]/g,'')
+    /* ة → ه */
+    .replace(/ة/g,'ه')
+    /* حذف اعراب */
+    .replace(/[\u064b-\u0652]/g,'')
+    /* حذف علائم */
+    .replace(/[.,،؛:؟!]/g,'')
+    .trim();
+}
+function extractNumber(s){
+  const converted = faToEnDigits(s);
+  const m = converted.match(/-?\d+/);
+  return m ? m[0] : null;
+}
+function isAnswerCorrect(userInput){
+  if(currentCategory.numeric){
+    const num = extractNumber(userInput);
+    if(num===null) return false;
+    return parseInt(num,10) === parseInt(currentQuestion.a,10);
+  } else {
+    const userNorm = normalizePlaceWord(userInput);
+    const correctNorm = normalizePlaceWord(currentQuestion.a);
+    
+    /* مقایسه‌ی مستقیم */
+    if(userNorm === correctNorm) return true;
+    
+    /* قبول کردن شکل‌های جایگزین */
+    const alternatives = {
+      'یکانهزار': ['یکانهزار','هزارگان','هزار'],
+      'دهگانهزار': ['دهگانهزار','دههزارگان','دههزار'],
+      'صدگانهزار': ['صدگانهزار','صدهزارگان','صدهزار'],
+      'یکانمیلیون': ['یکانمیلیون','میلیون'],
+      'دهگانمیلیون': ['دهگانمیلیون','دهمیلیون'],
+      'صدگانمیلیون': ['صدگانمیلیون','صدمیلیون'],
+      'یکانمیلیارد': ['یکانمیلیارد','میلیارد'],
+      'دهگانمیلیارد': ['دهگانمیلیارد','دهمیلیارد'],
+      'صدگانمیلیارد': ['صدگانمیلیارد','صدمیلیارد'],
+      'یکان': ['یکان'],
+      'دهگان': ['دهگان'],
+      'صدگان': ['صدگان']
+    };
+    
+    const alts = alternatives[correctNorm];
+    if(alts && alts.some(alt => normalizePlaceWord(alt) === userNorm)) return true;
+    
+    return false;
+  }
+}
+
+/* ---------- بررسی جواب ---------- */
+document.getElementById('qInput').addEventListener('keydown', e=>{
+  if(e.key==='Enter'){ e.preventDefault(); checkAnswer(); }
+});
+
+function checkAnswer(){
+  if(gameState!=='question') return;
+  const inputEl = document.getElementById('qInput');
+  const val = inputEl.value.trim();
+  if(!val) { inputEl.focus(); return; }
+
+  const fb = document.getElementById('qFeedback');
+
+  if(isAnswerCorrect(val)){
+    score += 50; correctCount++;
+    updateHUD();
+    soundCorrect();
+    fb.textContent = '✅ آفرین! درست بود.';
+    fb.style.color = '#2bb37a';
+    document.getElementById('qCheckBtn').disabled = true;
+    inputEl.disabled = true;
+    inputEl.blur();
+    const r = document.getElementById('qCard').getBoundingClientRect();
+    spawnScorePopup(r.left+r.width/2, r.top+40, '+۵۰', '#ffd166');
+    showNextBtn();
+  } else {
+    wrongCount++;
+    soundWrong();
+    wrongAnswers.push({
+      question: currentQuestion.q,
+      correctAnswer: currentQuestion.a,
+      userAnswer: val
+    });
+    document.getElementById('qCard').classList.remove('shake');
+    void document.getElementById('qCard').offsetWidth;
+    document.getElementById('qCard').classList.add('shake');
+    fb.textContent = `❌ پاسخ درست: ${currentQuestion.a}`;
+    fb.style.color = '#ff4757';
+    document.getElementById('qCheckBtn').disabled = true;
+    inputEl.disabled = true;
+    inputEl.blur();
+    showNextBtn();
+  }
+}
+
+/* ---------- نمایش دکمه‌ی سؤال بعدی ---------- */
+function showNextBtn(){
+  const btn = document.getElementById('qNextBtn');
+  btn.classList.add('show');
+  if(askedCount>=TOTAL_QUESTIONS){
+    btn.textContent = '🏁 دیدن نتیجه';
+  } else {
+    btn.textContent = 'سؤال بعدی ←';
+  }
+  setTimeout(()=>btn.scrollIntoView({behavior:'smooth', block:'center'}), 200);
+}
+
+/* ---------- رفتن به سؤال بعدی ---------- */
+function nextQuestion(){
+  if(askedCount>=TOTAL_QUESTIONS){
+    endGame();
+    return;
+  }
+  document.getElementById('qCard').classList.remove('show');
+  document.getElementById('qNextBtn').classList.remove('show');
+  document.getElementById('qInput').disabled=false;
+  gameState='idle';
+  document.getElementById('spinBtn').disabled=false;
+  document.getElementById('wheelMsg').textContent='🎡 گردونه را بچرخان!';
+}
+
+function spawnScorePopup(x,y,text,color){
+  const p=document.createElement('div');
+  p.className='score-pop'; p.textContent=text; p.style.left=x+'px'; p.style.top=y+'px';
+  if(color) p.style.color=color;
+  document.body.appendChild(p);
+  setTimeout(()=>p.remove(),1100);
+}
+
+/* ---------- پایان بازی ---------- */
+function endGame(){
+  gameState='idle';
+  const best = parseInt(localStorage.getItem('wheel_best_score')||'0');
+  const isNewBest = score>best;
+  if(isNewBest) localStorage.setItem('wheel_best_score', String(score));
+  const bestFinal = Math.max(best,score);
+
+  let msg;
+  if(score>=500) msg='🏆 قهرمان ریاضی! تو عالی بودی!';
+  else if(score>=350) msg='🌟 خیلی خوب! کمی دیگه تمرین کن.';
+  else if(score>=200) msg='👏 خوب بود! دوباره تلاش کن.';
+  else msg='💪 تلاش خوبی بود! کتاب رو یه بار دیگه مرور کن.';
+
+  document.getElementById('finishName').textContent = `دانش‌آموز: ${studentName}`;
+  document.getElementById('finishMsg').textContent = msg;
+  document.getElementById('resultTable').innerHTML = `
+    <div class="result-row"><span>امتیاز نهایی</span><b>${fa(score)} از ۵۰۰</b></div>
+    <div class="result-row"><span>پاسخ‌های درست</span><b>${fa(correctCount)} از ۱۰</b></div>
+    <div class="result-row"><span>پاسخ‌های غلط</span><b>${fa(wrongCount)}</b></div>
+  `;
+
+  const reviewList = document.getElementById('reviewList');
+  if(wrongAnswers.length === 0){
+    reviewList.innerHTML = '<div class="review-empty">🎉 آفرین! هیچ اشتباهی نداشتی!</div>';
+  } else {
+    reviewList.innerHTML = wrongAnswers.map(w => `
+      <div class="review-item">
+        <div class="q">${w.question.replace(/\d+/g, m => fa(m))}</div>
+        <span class="a">✅ پاسخ درست: ${w.correctAnswer}</span>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('bestScore').textContent = isNewBest ? `🎉 رکورد جدید: ${fa(bestFinal)}` : `بهترین امتیاز: ${fa(bestFinal)}`;
+
+  soundWin();
+  showScreen('finish');
+}
+</script>
+</body>
+</html>
